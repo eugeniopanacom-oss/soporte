@@ -1,4 +1,3 @@
-Mi admin.html:
 <!DOCTYPE html>
 <html lang="es">
 
@@ -1970,9 +1969,11 @@ Mi admin.html:
                 <div class="admin-user">
                     <i class="fas fa-user-shield"></i> Alexis - Barbero
                 </div>
-                <button class="logout-btn" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                <button class="logout-btn" id="logoutBtn" onclick="logout()">
+    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+</button>
                 </button>
+
             </div>
         </header>
 
@@ -2334,224 +2335,230 @@ Mi admin.html:
             </div>
         </section>
 
-        <!-- OFERTAS MEJORADAS -->
-        <section id="ofertas" class="dashboard-section">
-            <h2 class="section-title">Gestión de Ofertas Promocionales</h2>
+       <!-- OFERTAS MEJORADAS -->
+<section id="ofertas" class="dashboard-section">
+    <h2 class="section-title">Gestión de Ofertas Promocionales</h2>
 
-            <div class="dashboard-grid">
-                <!-- Configuración de oferta -->
-                <div class="dashboard-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-cog"></i> Configurar Oferta
-                    </h3>
+    <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; gap: 30px;">
+        <!-- COLUMNA IZQUIERDA: Configurar Oferta + Programa de Fidelidad -->
+        <div style="display: flex; flex-direction: column; gap: 25px;">
+            <!-- Configuración de oferta -->
+            <div class="dashboard-card">
+                <h3 class="card-title">
+                    <i class="fas fa-cog"></i> Configurar Oferta
+                </h3>
 
-                    <div class="oferta-config">
-                        <div class="form-group">
-                            <label for="ofertaNombre">Nombre de la Oferta</label>
-                            <input type="text" id="ofertaNombre" class="form-control" value="Corte + Afeitado Especial"
-                                placeholder="Ej: Combo Premium">
-                        </div>
+                <div class="oferta-config">
+                    <div class="form-group">
+                        <label for="ofertaNombre">Nombre de la Oferta</label>
+                        <input type="text" id="ofertaNombre" class="form-control" value="Corte + Afeitado Especial"
+                            placeholder="Ej: Combo Premium">
+                    </div>
 
-                        <div class="form-group">
-                            <label for="ofertaDescripcion">Descripción</label>
-                            <textarea id="ofertaDescripcion" class="form-control" rows="2"
-                                placeholder="Describe la oferta...">¡Oferta limitada! Corte de cabello + afeitado clásico</textarea>
-                        </div>
+                    <div class="form-group">
+                        <label for="ofertaDescripcion">Descripción</label>
+                        <textarea id="ofertaDescripcion" class="form-control" rows="2"
+                            placeholder="Describe la oferta...">¡Oferta limitada! Corte de cabello + afeitado clásico</textarea>
+                    </div>
 
-                        <div class="oferta-precios">
-                            <div class="precio-group" style="background-color: var(--dark); padding: 15px; border-radius: var(--border-radius);">
-                                <div class="precio-label">Precio Normal</div>
-                                <div class="precio-valor">
-                                    $<input type="number" id="precioNormal" value="4700" style="width: 100px; background: transparent; border: none; color: var(--primary); font-size: 1.5rem; font-weight: bold;">
-                                </div>
-                            </div>
-
-                            <div class="precio-group" style="background-color: var(--dark); padding: 15px; border-radius: var(--border-radius);">
-                                <div class="precio-label">Precio con Oferta</div>
-                                <div class="precio-valor">
-                                    $<input type="number" id="precioOferta" value="3900" style="width: 100px; background: transparent; border: none; color: var(--primary); font-size: 1.5rem; font-weight: bold;">
-                                </div>
-                                <div class="precio-descuento" id="descuentoCalculado">
-                                    Ahorro: $800 (17%)
-                                </div>
+                    <div class="oferta-precios">
+                        <div class="precio-group" style="background-color: var(--dark); padding: 15px; border-radius: var(--border-radius);">
+                            <div class="precio-label">Precio Normal</div>
+                            <div class="precio-valor">
+                                $<input type="number" id="precioNormal" value="4700" style="width: 100px; background: transparent; border: none; color: var(--primary); font-size: 1.5rem; font-weight: bold;">
                             </div>
                         </div>
 
-                        <!-- DURACIÓN DE LA OFERTA -->
-                        <div class="form-group">
-                            <label>Tipo de Duración</label>
-                            <div class="opciones-duracion">
-                                <div class="opcion-duracion active" data-tipo="horas">
-                                    <i class="fas fa-clock"></i>
-                                    <div style="font-weight: bold; margin: 5px 0;">Por horas</div>
-                                    <div style="color: #aaa; font-size: 0.9rem;">Desde ahora por X horas</div>
-                                </div>
-                                <div class="opcion-duracion" data-tipo="rango-fecha">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <div style="font-weight: bold; margin: 5px 0;">Rango de fecha</div>
-                                    <div style="color: #aaa; font-size: 0.9rem;">Fecha específica con horarios</div>
-                                </div>
+                        <div class="precio-group" style="background-color: var(--dark); padding: 15px; border-radius: var(--border-radius);">
+                            <div class="precio-label">Precio con Oferta</div>
+                            <div class="precio-valor">
+                                $<input type="number" id="precioOferta" value="3900" style="width: 100px; background: transparent; border: none; color: var(--primary); font-size: 1.5rem; font-weight: bold;">
+                            </div>
+                            <div class="precio-descuento" id="descuentoCalculado">
+                                Ahorro: $800 (17%)
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Configuración por horas -->
-                        <div id="configHoras" class="form-group">
-                            <label>Duración en horas</label>
-                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                                <input type="number" id="duracionHoras" class="form-control" value="24" min="1" style="width: 100px;">
-                                <span>horas</span>
-                                <div style="background-color: var(--info); color: white; padding: 5px 10px; border-radius: var(--border-radius);">
-                                    <i class="fas fa-clock"></i> <span id="textoDuracion">1 día</span>
-                                </div>
+                    <!-- DURACIÓN DE LA OFERTA -->
+                    <div class="form-group">
+                        <label>Tipo de Duración</label>
+                        <div class="opciones-duracion">
+                            <div class="opcion-duracion active" data-tipo="horas">
+                                <i class="fas fa-clock"></i>
+                                <div style="font-weight: bold; margin: 5px 0;">Por horas</div>
+                                <div style="color: #aaa; font-size: 0.9rem;">Desde ahora por X horas</div>
+                            </div>
+                            <div class="opcion-duracion" data-tipo="rango-fecha">
+                                <i class="fas fa-calendar-alt"></i>
+                                <div style="font-weight: bold; margin: 5px 0;">Rango de fecha</div>
+                                <div style="color: #aaa; font-size: 0.9rem;">Fecha específica con horarios</div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Configuración por rango de fecha -->
-                        <div id="configRangoFecha" class="form-group" style="display: none;">
-                            <label>Rango de fecha y horarios</label>
-                            <div style="margin-top: 10px;">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                                    <div>
-                                        <label>Fecha de inicio</label>
-                                        <input type="date" id="fechaInicioOferta" class="form-control">
-                                    </div>
-                                    <div>
-                                        <label>Fecha de fin</label>
-                                        <input type="date" id="fechaFinOferta" class="form-control">
-                                    </div>
-                                </div>
-                                
-                                <div class="rango-horario">
-                                    <div>
-                                        <label>Hora de inicio diario</label>
-                                        <input type="time" id="horaInicioOferta" class="form-control" value="09:00">
-                                    </div>
-                                    <div>
-                                        <label>Hora de fin diario</label>
-                                        <input type="time" id="horaFinOferta" class="form-control" value="19:00">
-                                    </div>
-                                </div>
-                                
-                                <div style="margin-top: 10px; color: #aaa; font-size: 0.9rem;">
-                                    <i class="fas fa-info-circle"></i> La oferta solo estará disponible en estos horarios
-                                </div>
+                    <!-- Configuración por horas -->
+                    <div id="configHoras" class="form-group">
+                        <label>Duración en horas</label>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                            <input type="number" id="duracionHoras" class="form-control" value="24" min="1" style="width: 100px;">
+                            <span>horas</span>
+                            <div style="background-color: var(--info); color: white; padding: 5px 10px; border-radius: var(--border-radius);">
+                                <i class="fas fa-clock"></i> <span id="textoDuracion">1 día</span>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label>Estado de la Oferta</label>
-                            <div style="display: flex; gap: 15px; margin-top: 10px;">
-                                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                                    <input type="radio" name="estadoOferta" value="activa" checked>
-                                    <span style="background-color: var(--success); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
-                                        <i class="fas fa-check-circle"></i> Activa
-                                    </span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                                    <input type="radio" name="estadoOferta" value="inactiva">
-                                    <span style="background-color: var(--error); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
-                                        <i class="fas fa-times-circle"></i> Inactiva
-                                    </span>
-                                </label>
+                    <!-- Configuración por rango de fecha -->
+                    <div id="configRangoFecha" class="form-group" style="display: none;">
+                        <label>Rango de fecha y horarios</label>
+                        <div style="margin-top: 10px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <div>
+                                    <label>Fecha de inicio</label>
+                                    <input type="date" id="fechaInicioOferta" class="form-control">
+                                </div>
+                                <div>
+                                    <label>Fecha de fin</label>
+                                    <input type="date" id="fechaFinOferta" class="form-control">
+                                </div>
+                            </div>
+                            
+                            <div class="rango-horario">
+                                <div>
+                                    <label>Hora de inicio diario</label>
+                                    <input type="time" id="horaInicioOferta" class="form-control" value="09:00">
+                                </div>
+                                <div>
+                                    <label>Hora de fin diario</label>
+                                    <input type="time" id="horaFinOferta" class="form-control" value="19:00">
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 10px; color: #aaa; font-size: 0.9rem;">
+                                <i class="fas fa-info-circle"></i> La oferta solo estará disponible en estos horarios
                             </div>
                         </div>
+                    </div>
 
-                        <div style="display: flex; gap: 10px; margin-top: 25px;">
-                            <button class="btn-accion btn-asistio" id="activarOferta" style="flex: 1;">
-                                <i class="fas fa-play-circle"></i> Activar Oferta
-                            </button>
-                            <button class="btn-accion btn-confirmar" id="verVistaPrevia" style="flex: 1;">
-                                <i class="fas fa-eye"></i> Ver Vista Previa
-                            </button>
+                    <div class="form-group">
+                        <label>Estado de la Oferta</label>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="radio" name="estadoOferta" value="activa" checked>
+                                <span style="background-color: var(--success); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle"></i> Activa
+                                </span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="radio" name="estadoOferta" value="inactiva">
+                                <span style="background-color: var(--error); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-times-circle"></i> Inactiva
+                                </span>
+                            </label>
                         </div>
+                    </div>
 
-<!-- Fidelidad en el apartado ofertas-->
- <div class="dashboard-card programa-fidelidad">
-    <h3 class="card-title">
-        <i class="fas fa-crown"></i> Programa de Fidelidad
-    </h3>
-    
-    <div class="oferta-config">
-        <!-- Estado del programa -->
-        <div class="form-group">
-            <label>Estado del Programa de Fidelidad</label>
-            <div style="display: flex; gap: 15px; margin-top: 10px;">
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                    <input type="radio" name="estadoFidelidad" value="activo" checked>
-                    <span style="background-color: var(--success); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-check-circle"></i> Activo
-                    </span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                    <input type="radio" name="estadoFidelidad" value="inactivo">
-                    <span style="background-color: var(--error); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-times-circle"></i> Inactivo
-                    </span>
-                </label>
-            </div>
-        </div>
-        
-        <!-- Configuración de turnos -->
-        <div class="form-group">
-            <label for="turnosParaGratis">Cantidad de turnos para obtener uno gratis</label>
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <span>Después de</span>
-                    <input type="number" id="turnosParaGratis" class="form-control" value="3" min="1" max="10" style="width: 80px;">
-                    <span>turnos confirmados y asistidos</span>
-                </div>
-                <div style="font-size: 1.5rem; color: var(--primary);">→</div>
-                <div style="background-color: rgba(212, 175, 55, 0.2); color: var(--primary); padding: 10px 15px; border-radius: var(--border-radius); font-weight: bold;">
-                    El siguiente es GRATIS
+                    <div style="display: flex; gap: 10px; margin-top: 25px;">
+                        <button class="btn-accion btn-asistio" id="activarOferta" style="flex: 1;">
+                            <i class="fas fa-play-circle"></i> Activar Oferta
+                        </button>
+                        <button class="btn-accion btn-confirmar" id="verVistaPrevia" style="flex: 1;">
+                            <i class="fas fa-eye"></i> Ver Vista Previa
+                        </button>
+                        <button class="btn-accion btn-cancelar" id="cancelarEdicionOferta" style="flex: 1; display: none;">
+                            <i class="fas fa-times"></i> Cancelar Edición
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">
-                <i class="fas fa-info-circle"></i> Ej: 3 turnos asistidos = 4to gratis
+
+            <!-- Programa de Fidelidad -->
+            <div class="dashboard-card programa-fidelidad">
+                <h3 class="card-title">
+                    <i class="fas fa-crown"></i> Programa de Fidelidad
+                </h3>
+                
+                <div class="oferta-config">
+                    <!-- Estado del programa -->
+                    <div class="form-group">
+                        <label>Estado del Programa de Fidelidad</label>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="radio" name="estadoFidelidad" value="activo" checked>
+                                <span style="background-color: var(--success); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle"></i> Activo
+                                </span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="radio" name="estadoFidelidad" value="inactivo">
+                                <span style="background-color: var(--error); color: white; padding: 8px 15px; border-radius: var(--border-radius); display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-times-circle"></i> Inactivo
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuración de turnos -->
+                    <div class="form-group">
+                        <label for="turnosParaGratis">Cantidad de turnos para obtener uno gratis</label>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <span>Después de</span>
+                                <input type="number" id="turnosParaGratis" class="form-control" value="3" min="1" max="10" style="width: 80px;">
+                                <span>turnos confirmados y asistidos</span>
+                            </div>
+                            <div style="font-size: 1.5rem; color: var(--primary);">→</div>
+                            <div style="background-color: rgba(212, 175, 55, 0.2); color: var(--primary); padding: 10px 15px; border-radius: var(--border-radius); font-weight: bold;">
+                                El siguiente es GRATIS
+                            </div>
+                        </div>
+                        <div style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Ej: 3 turnos asistidos = 4to gratis
+                        </div>
+                    </div>
+                    
+                    <!-- Instrucciones -->
+                    <div style="background-color: rgba(33, 150, 243, 0.1); padding: 15px; border-radius: var(--border-radius); margin-top: 20px; border-left: 4px solid var(--info);">
+                        <div style="color: var(--info); font-weight: bold; margin-bottom: 10px;">
+                            <i class="fas fa-info-circle"></i> Cómo funciona:
+                        </div>
+                        <ol style="color: #aaa; margin-left: 15px; font-size: 0.9rem;">
+                            <li>El cliente debe tener <strong id="turnosRequeridosEjemplo">3 turnos</strong> con estado "Asistió"</li>
+                            <li>El sistema cuenta automáticamente los turnos asistidos por teléfono</li>
+                            <li>Cuando complete la cantidad requerida, el próximo turno se marcará como GRATIS</li>
+                            <li>Puedes editar manualmente el contador en los detalles del turno</li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div style="display: flex; gap: 10px; margin-top: 25px;">
+                        <button class="btn-accion btn-asistio" id="guardarConfigFidelidad" style="flex: 1;">
+                            <i class="fas fa-save"></i> Guardar Configuración
+                        </button>
+                        <button class="btn-accion btn-confirmar" onclick="verClientesConFidelidad()" style="flex: 1;">
+                            <i class="fas fa-users"></i> Ver Clientes en Programa
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <!-- Instrucciones -->
-        <div style="background-color: rgba(33, 150, 243, 0.1); padding: 15px; border-radius: var(--border-radius); margin-top: 20px; border-left: 4px solid var(--info);">
-            <div style="color: var(--info); font-weight: bold; margin-bottom: 10px;">
-                <i class="fas fa-info-circle"></i> Cómo funciona:
+
+        <!-- COLUMNA DERECHA: Solo Ofertas Vigentes -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <i class="fas fa-list"></i> Ofertas Vigentes
+            </h3>
+
+            <div class="ofertas-lista" id="listaOfertas" style="max-height: 850px; overflow-y: auto;">
+                <div style="text-align: center; padding: 20px; color: #aaa;">
+                    <i class="fas fa-spinner loading-spinner"></i>
+                    <p>Cargando ofertas...</p>
+                </div>
             </div>
-            <ol style="color: #aaa; margin-left: 15px; font-size: 0.9rem;">
-                <li>El cliente debe tener <strong id="turnosRequeridosEjemplo">3 turnos</strong> con estado "Asistió"</li>
-                <li>El sistema cuenta automáticamente los turnos asistidos por teléfono</li>
-                <li>Cuando complete la cantidad requerida, el próximo turno se marcará como GRATIS</li>
-                <li>Puedes editar manualmente el contador en los detalles del turno</li>
-            </ol>
-        </div>
-        
-        <!-- Botones de acción -->
-        <div style="display: flex; gap: 10px; margin-top: 25px;">
-            <button class="btn-accion btn-asistio" id="guardarConfigFidelidad" style="flex: 1;">
-                <i class="fas fa-save"></i> Guardar Configuración
-            </button>
-            <button class="btn-accion btn-confirmar" onclick="verClientesConFidelidad()" style="flex: 1;">
-                <i class="fas fa-users"></i> Ver Clientes en Programa
-            </button>
         </div>
     </div>
-</div>
-                    </div>
-                </div>
-
-                <!-- Lista de ofertas vigentes -->
-                <div class="dashboard-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-list"></i> Ofertas Vigentes
-                    </h3>
-
-                    <div class="ofertas-lista" id="listaOfertas" style="max-height: 850px; overflow-y: auto;">
-                        <div style="text-align: center; padding: 20px; color: #aaa;">
-                            <i class="fas fa-spinner loading-spinner"></i>
-                            <p>Cargando ofertas...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+</section>
         
         <!-- SECCIÓN MÉTRICAS MENSUALES -->
         <section id="metricas" class="dashboard-section">
@@ -4533,30 +4540,6 @@ async function login() {
     }
 }
 
-// ========== LOGOUT ==========
-async function logout() {
-    try {
-        // Limpiar localStorage
-        localStorage.removeItem('admin_logged_in');
-        localStorage.removeItem('admin_email');
-        
-        // Intentar cerrar sesión de Firebase si está autenticado
-        if (auth.currentUser) {
-            await auth.signOut();
-        }
-        
-        showNotification('Sesión cerrada', 'info');
-        
-        // Mostrar modal de login nuevamente
-        document.getElementById('loginModal').style.display = 'flex';
-        document.querySelector('.container').style.display = 'none';
-        
-    } catch (error) {
-        console.error('Error al cerrar sesión:', error);
-        showNotification('Error al cerrar sesión', 'error');
-    }
-}
-
 // Función para probar autenticación manualmente
 async function testAuth() {
     console.log('=== TEST DE AUTENTICACIÓN ===');
@@ -5991,10 +5974,14 @@ function actualizarTextoDuracion() {
     ofertaConfig.duracionHoras = horas;
 }
 
-async function loadOfertas() {
+  async function loadOfertas() {
     try {
         console.log('Cargando ofertas de Firebase...');
         
+        // PRIMERO: ELIMINAR OFERTAS EXPIRADAS
+        await eliminarOfertasExpiradas();
+        
+        // SEGUNDO: CARGAR SOLO LAS OFERTAS VIGENTES
         const result = await safeFirebaseQuery(
             () => db.collection('ofertas')
                 .orderBy('creado_en', 'desc')
@@ -6003,11 +5990,16 @@ async function loadOfertas() {
         );
         
         if (result) {
-            ofertasActivas = result.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            console.log('Ofertas cargadas:', ofertasActivas.length);
+            // Filtrar solo ofertas activas Y vigentes
+            ofertasActivas = result.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(oferta => {
+                    // Solo mantener ofertas activas Y vigentes
+                    const esVigente = verificarOfertaVigente(oferta);
+                    return oferta.activa === true && esVigente === true;
+                });
+            
+            console.log('Ofertas vigentes cargadas:', ofertasActivas.length);
             renderOfertas();
         }
         
@@ -6058,6 +6050,76 @@ function verificarOfertaVigente(oferta) {
     // Si no hay datos de fin, la oferta es indefinida
     console.log('No hay datos de fin, oferta indefinida');
     return true; // Asumir vigente si no hay fecha de fin
+}
+
+async function eliminarOfertasExpiradas() {
+    try {
+        console.log('🔍 Verificando ofertas expiradas...');
+        
+        // Obtener todas las ofertas de Firebase
+        const snapshot = await db.collection('ofertas').get();
+        const ahora = new Date();
+        
+        let ofertasEliminadas = 0;
+        
+        for (const doc of snapshot.docs) {
+            const oferta = { id: doc.id, ...doc.data() };
+            let expirada = false;
+            
+            // Verificar si la oferta está expirada según su tipo
+            if (oferta.activa === false) {
+                // Si está inactiva manualmente, la consideramos expirada para eliminación
+                expirada = true;
+                console.log(`📌 Oferta inactiva (manual): ${oferta.nombre}`);
+            }
+            else if (oferta.tipo_duracion === 'horas' && oferta.fin) {
+                // Ofertas por horas - verificar fecha de fin
+                let fechaFin;
+                if (oferta.fin.toDate) {
+                    fechaFin = oferta.fin.toDate();
+                } else if (oferta.fin.seconds) {
+                    fechaFin = new Date(oferta.fin.seconds * 1000);
+                } else {
+                    fechaFin = new Date(oferta.fin);
+                }
+                
+                if (ahora > fechaFin) {
+                    expirada = true;
+                    console.log(`⏰ Oferta expirada por horas: ${oferta.nombre} (Fin: ${fechaFin.toLocaleString()})`);
+                }
+            }
+            else if (oferta.tipo_duracion === 'rango-fecha' && oferta.fecha_fin && oferta.hora_fin) {
+                // Ofertas por rango de fecha
+                const fechaHoraFin = `${oferta.fecha_fin}T${oferta.hora_fin}`;
+                const fin = new Date(fechaHoraFin);
+                
+                if (ahora > fin) {
+                    expirada = true;
+                    console.log(`📅 Oferta expirada por rango: ${oferta.nombre} (Fin: ${fin.toLocaleString()})`);
+                }
+            }
+            
+            // Eliminar oferta expirada
+            if (expirada) {
+                await db.collection('ofertas').doc(oferta.id).delete();
+                ofertasEliminadas++;
+                console.log(`🗑️ Oferta eliminada: ${oferta.nombre} (ID: ${oferta.id})`);
+            }
+        }
+        
+        if (ofertasEliminadas > 0) {
+            console.log(`✅ ${ofertasEliminadas} oferta(s) expirada(s) eliminada(s)`);
+            showNotification(`${ofertasEliminadas} oferta(s) expirada(s) eliminada(s)`, 'info');
+        } else {
+            console.log('✅ No se encontraron ofertas expiradas');
+        }
+        
+        return ofertasEliminadas;
+        
+    } catch (error) {
+        console.error('❌ Error al eliminar ofertas expiradas:', error);
+        return 0;
+    }
 }
 
 async function eliminarOferta(id) {
@@ -6129,6 +6191,7 @@ async function crearOfertaEjemplo() {
     }
 }
 
+// ========== FUNCIÓN PARA GUARDAR/ACTUALIZAR OFERTA (REEMPLAZAR COMPLETAMENTE) ==========
 async function activarOferta() {
     try {
         showLoading();
@@ -6147,22 +6210,21 @@ async function activarOferta() {
             precio_oferta: precioOferta,
             activa: estadoActiva,
             tipo_duracion: tipoDuracion,
-            creado_en: firebase.firestore.FieldValue.serverTimestamp()
+            actualizado_en: firebase.firestore.FieldValue.serverTimestamp()
         };
         
         const ahora = new Date();
         
+        // Configurar según tipo de duración
         if (tipoDuracion === 'horas') {
             const horas = parseInt(document.getElementById('duracionHoras').value);
-            const inicio = ahora;
-            const fin = new Date(ahora.getTime() + (horas * 60 * 60 * 1000));
             
             // Guardar como Timestamp de Firestore
-            ofertaData.inicio = firebase.firestore.Timestamp.fromDate(inicio);
-            ofertaData.fin = firebase.firestore.Timestamp.fromDate(fin);
+            ofertaData.inicio = firebase.firestore.Timestamp.fromDate(ahora);
+            ofertaData.fin = firebase.firestore.Timestamp.fromDate(new Date(ahora.getTime() + (horas * 60 * 60 * 1000)));
             ofertaData.duracion_horas = horas;
             
-            console.log('Oferta por horas - Inicio:', inicio, 'Fin:', fin, 'Horas:', horas);
+            console.log('Oferta por horas - Inicio:', ahora, 'Fin:', ofertaData.fin.toDate(), 'Horas:', horas);
         } else {
             const fechaInicio = document.getElementById('fechaInicioOferta').value;
             const fechaFin = document.getElementById('fechaFinOferta').value;
@@ -6180,23 +6242,96 @@ async function activarOferta() {
                 const fin = new Date(`${fechaFin}T${horaFin}`);
                 ofertaData.fin = firebase.firestore.Timestamp.fromDate(fin);
             }
+            if (fechaInicio && horaInicio) {
+                const inicio = new Date(`${fechaInicio}T${horaInicio}`);
+                ofertaData.inicio = firebase.firestore.Timestamp.fromDate(inicio);
+            }
             
             console.log('Oferta por rango - Fecha fin:', fechaFin, 'Hora fin:', horaFin);
         }
         
-        console.log('Guardando oferta:', ofertaData);
+        // 🔴 IMPORTANTE: VERIFICAR SI ES EDICIÓN O CREACIÓN
+        if (ofertaConfig.id) {
+            // ✅ MODO EDICIÓN: ACTUALIZAR oferta existente (NO crear nueva)
+            console.log('🔄 ACTUALIZANDO oferta existente ID:', ofertaConfig.id);
+            
+            // Mantener la fecha de creación original
+            if (ofertaConfig.creado_en) {
+                ofertaData.creado_en = ofertaConfig.creado_en;
+            }
+            
+            await db.collection('ofertas').doc(ofertaConfig.id).update(ofertaData);
+            showNotification('Oferta actualizada correctamente', 'success');
+            
+            // Limpiar modo edición
+            cancelarEdicionOferta();
+        } else {
+            // ➕ MODO NUEVO: CREAR nueva oferta
+            console.log('➕ CREANDO nueva oferta');
+            
+            ofertaData.creado_en = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('ofertas').add(ofertaData);
+            showNotification('Oferta activada correctamente', 'success');
+        }
         
-        await db.collection('ofertas').add(ofertaData);
-        
-        showNotification('Oferta activada correctamente', 'success');
         await loadOfertas();
         hideLoading();
         
     } catch (error) {
-        console.error('Error al activar oferta:', error);
-        showNotification('Error al activar la oferta: ' + error.message, 'error');
+        console.error('Error al guardar oferta:', error);
+        showNotification('Error al guardar la oferta: ' + error.message, 'error');
         hideLoading();
     }
+}
+
+// ========== FUNCIÓN PARA CANCELAR EDICIÓN (AGREGAR ESTA NUEVA) ==========
+function cancelarEdicionOferta() {
+    // Restaurar formulario a valores por defecto
+    document.getElementById('ofertaNombre').value = 'Corte + Afeitado Especial';
+    document.getElementById('ofertaDescripcion').value = '¡Oferta limitada! Corte de cabello + afeitado clásico';
+    document.getElementById('precioNormal').value = 4700;
+    document.getElementById('precioOferta').value = 3900;
+    document.getElementById('duracionHoras').value = 24;
+    document.querySelector('input[name="estadoOferta"][value="activa"]').checked = true;
+    
+    // Restaurar tipo de duración a "horas"
+    document.querySelectorAll('.opcion-duracion').forEach(o => {
+        o.classList.remove('active');
+    });
+    document.querySelector('.opcion-duracion[data-tipo="horas"]').classList.add('active');
+    document.getElementById('configHoras').style.display = 'block';
+    document.getElementById('configRangoFecha').style.display = 'none';
+    ofertaConfig.tipoDuracion = 'horas';
+    
+    // Restaurar botón
+    const activarBtn = document.getElementById('activarOferta');
+    if (activarBtn) {
+        activarBtn.innerHTML = '<i class="fas fa-play-circle"></i> Activar Oferta';
+    }
+    
+    // Ocultar botón cancelar
+    const cancelBtn = document.getElementById('cancelarEdicionOferta');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'none';
+    }
+    
+    // Limpiar ID de edición
+    ofertaConfig.id = null;
+    ofertaConfig.creado_en = null;
+    
+    // Remover instrucción de edición
+    const instruccion = document.getElementById('instruccion-edicion');
+    if (instruccion) {
+        instruccion.remove();
+    }
+    
+    // Remover estilos de edición
+    const formContainer = document.querySelector('.oferta-config');
+    if (formContainer) {
+        formContainer.classList.remove('editing');
+    }
+    
+    console.log('✅ Modo edición cancelado');
 }
 
 async function eliminarServicio (id) {
@@ -6319,6 +6454,7 @@ function renderOfertas() {
     container.innerHTML = html;
 }
 
+// ========== MODIFICAR FUNCIÓN EDITAR OFERTA ==========
 async function editarOferta(id) {
     try {
         showLoading();
@@ -6327,18 +6463,31 @@ async function editarOferta(id) {
         if (doc.exists) {
             const oferta = { id: doc.id, ...doc.data() };
             
+            console.log('📝 EDITANDO oferta:', oferta.nombre);
+            
             // Cargar datos en el formulario
-            document.getElementById('ofertaNombre').value = oferta.nombre;
-            document.getElementById('ofertaDescripcion').value = oferta.descripcion;
-            document.getElementById('precioNormal').value = oferta.precio_normal;
-            document.getElementById('precioOferta').value = oferta.precio_oferta;
+            document.getElementById('ofertaNombre').value = oferta.nombre || '';
+            document.getElementById('ofertaDescripcion').value = oferta.descripcion || '';
+            document.getElementById('precioNormal').value = oferta.precio_normal || 0;
+            document.getElementById('precioOferta').value = oferta.precio_oferta || 0;
             
             // Configurar tipo de duración
-            if (oferta.tipo_duracion === 'horas') {
-                document.querySelector('.opcion-duracion[data-tipo="horas"]').click();
+            const tipoDuracion = oferta.tipo_duracion || 'horas';
+            document.querySelectorAll('.opcion-duracion').forEach(o => {
+                o.classList.remove('active');
+                if (o.dataset.tipo === tipoDuracion) {
+                    o.classList.add('active');
+                }
+            });
+            
+            if (tipoDuracion === 'horas') {
+                document.getElementById('configHoras').style.display = 'block';
+                document.getElementById('configRangoFecha').style.display = 'none';
                 document.getElementById('duracionHoras').value = oferta.duracion_horas || 24;
             } else {
-                document.querySelector('.opcion-duracion[data-tipo="rango-fecha"]').click();
+                document.getElementById('configHoras').style.display = 'none';
+                document.getElementById('configRangoFecha').style.display = 'block';
+                
                 if (oferta.fecha_inicio) document.getElementById('fechaInicioOferta').value = oferta.fecha_inicio;
                 if (oferta.fecha_fin) document.getElementById('fechaFinOferta').value = oferta.fecha_fin;
                 if (oferta.hora_inicio) document.getElementById('horaInicioOferta').value = oferta.hora_inicio;
@@ -6348,22 +6497,263 @@ async function editarOferta(id) {
             // Configurar estado
             document.querySelector(`input[name="estadoOferta"][value="${oferta.activa ? 'activa' : 'inactiva'}"]`).checked = true;
             
-            // Guardar ID para actualizar
+            // Guardar ID y fecha de creación en la configuración
             ofertaConfig.id = id;
+            ofertaConfig.creado_en = oferta.creado_en;
+            ofertaConfig.tipoDuracion = tipoDuracion;
             
             // Cambiar texto del botón
-            document.getElementById('activarOferta').innerHTML = '<i class="fas fa-save"></i> Actualizar Oferta';
+            const activarBtn = document.getElementById('activarOferta');
+            if (activarBtn) {
+                activarBtn.innerHTML = '<i class="fas fa-save"></i> Actualizar Oferta';
+            }
+            
+            // Mostrar botón de cancelar edición
+            let cancelBtn = document.getElementById('cancelarEdicionOferta');
+            if (!cancelBtn) {
+                cancelBtn = document.createElement('button');
+                cancelBtn.id = 'cancelarEdicionOferta';
+                cancelBtn.className = 'btn-accion btn-cancelar';
+                cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancelar Edición';
+                cancelBtn.onclick = cancelarEdicionOferta;
+                activarBtn.parentNode.appendChild(cancelBtn);
+            }
+            cancelBtn.style.display = 'inline-block';
+            
+            // Animar formulario para indicar edición
+            aplicarAnimacionEdicionOferta();
             
             showNotification('Oferta cargada para editar', 'info');
-            
-            // Desplazar a la sección de configuración
-            document.getElementById('activarOferta').scrollIntoView({ behavior: 'smooth' });
         }
         
         hideLoading();
+        
     } catch (error) {
         console.error('Error al cargar oferta:', error);
         showNotification('Error al cargar la oferta', 'error');
+        hideLoading();
+    }
+}
+
+// Función para aplicar animación al formulario de ofertas
+function aplicarAnimacionEdicionOferta() {
+    const formContainer = document.querySelector('.oferta-config');
+    if (!formContainer) return;
+    
+    // Agregar clase de animación
+    formContainer.classList.add('editing');
+    
+    // Agregar estilos CSS para la animación
+    if (!document.getElementById('oferta-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'oferta-animation-style';
+        style.textContent = `
+            .oferta-config.editing {
+                animation: pulse-highlight 2s ease-in-out;
+                position: relative;
+            }
+            
+            .oferta-config.editing:before {
+                content: "✏️ EDITANDO OFERTA";
+                position: absolute;
+                top: -20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #d4af37, #b8941f);
+                color: #121212;
+                padding: 8px 20px;
+                border-radius: 20px;
+                font-weight: bold;
+                font-size: 0.9rem;
+                z-index: 10;
+                animation: bounce 2s infinite;
+                box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+                border: 2px solid #b8941f;
+            }
+            
+            @keyframes pulse-highlight {
+                0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+                50% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: translateX(-50%) translateY(0); }
+                50% { transform: translateX(-50%) translateY(-5px); }
+            }
+            
+            /* Resaltar campos editables */
+            .oferta-config.editing input,
+            .oferta-config.editing textarea,
+            .oferta-config.editing select {
+                border: 2px solid var(--primary) !important;
+                background-color: rgba(212, 175, 55, 0.05) !important;
+            }
+            
+            .oferta-config.editing .precio-valor input {
+                border: 3px solid #d4af37 !important;
+                background: rgba(212, 175, 55, 0.1) !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Agregar instrucción visual
+    if (!document.getElementById('instruccion-edicion')) {
+        const instruccion = document.createElement('div');
+        instruccion.id = 'instruccion-edicion';
+        instruccion.style.cssText = `
+            text-align: center;
+            padding: 10px;
+            margin: 15px 0;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            animation: fadeIn 0.5s ease;
+        `;
+        instruccion.innerHTML = `
+            <i class="fas fa-edit"></i> 
+            <strong>Modo edición activo</strong> - 
+            <span style="color: #aaa; font-size: 0.9rem;">
+                Edita los campos y haz clic en "Actualizar Oferta"
+            </span>
+        `;
+        
+        // Insertar después del título
+        const titulo = formContainer.querySelector('.card-title');
+        if (titulo) {
+            titulo.parentNode.insertBefore(instruccion, titulo.nextSibling);
+        }
+    }
+    
+    // Enfocar el primer campo
+    setTimeout(() => {
+        const firstInput = formContainer.querySelector('input');
+        if (firstInput) {
+            firstInput.focus();
+            firstInput.select();
+        }
+    }, 300);
+    
+    // Remover animación después de 5 segundos
+    setTimeout(() => {
+        formContainer.classList.remove('editing');
+    }, 5000);
+}
+
+// Función para cancelar edición de oferta
+function cancelarEdicionOferta() {
+    if (confirm('¿Cancelar la edición de esta oferta? Los cambios no guardados se perderán.')) {
+        // Restaurar formulario
+        resetFormularioOferta();
+        
+        // Restaurar botón
+        document.getElementById('activarOferta').innerHTML = '<i class="fas fa-play-circle"></i> Activar Oferta';
+        
+        // Ocultar botón cancelar
+        const cancelBtn = document.getElementById('cancelarEdicionOferta');
+        if (cancelBtn) {
+            cancelBtn.style.display = 'none';
+        }
+        
+        // Limpiar ID
+        ofertaConfig.id = null;
+        
+        // Remover instrucción
+        const instruccion = document.getElementById('instruccion-edicion');
+        if (instruccion) {
+            instruccion.remove();
+        }
+        
+        // Remover estilos de edición
+        const formContainer = document.querySelector('.oferta-config');
+        if (formContainer) {
+            formContainer.classList.remove('editing');
+        }
+        
+        showNotification('Edición cancelada', 'info');
+    }
+}
+
+// También actualiza la función actualizarOferta para limpiar la animación
+async function actualizarOferta(id) {
+    try {
+        showLoading();
+        
+        const nombre = document.getElementById('ofertaNombre').value;
+        const descripcion = document.getElementById('ofertaDescripcion').value;
+        const precioNormal = parseFloat(document.getElementById('precioNormal').value);
+        const precioOferta = parseFloat(document.getElementById('precioOferta').value);
+        const estadoActiva = document.querySelector('input[name="estadoOferta"][value="activa"]').checked;
+        const tipoDuracion = ofertaConfig.tipoDuracion;
+        
+        const ofertaData = {
+            nombre,
+            descripcion,
+            precio_normal: precioNormal,
+            precio_oferta: precioOferta,
+            activa: estadoActiva,
+            tipo_duracion: tipoDuracion,
+            actualizado_en: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        if (tipoDuracion === 'horas') {
+            const horas = parseInt(document.getElementById('duracionHoras').value);
+            const inicio = new Date();
+            const fin = new Date();
+            fin.setHours(fin.getHours() + horas);
+            
+            ofertaData.inicio = inicio;
+            ofertaData.fin = fin;
+            ofertaData.duracion_horas = horas;
+        } else {
+            const fechaInicio = document.getElementById('fechaInicioOferta').value;
+            const fechaFin = document.getElementById('fechaFinOferta').value;
+            const horaInicio = document.getElementById('horaInicioOferta').value;
+            const horaFin = document.getElementById('horaFinOferta').value;
+            
+            if (fechaInicio && horaInicio) {
+                ofertaData.fecha_inicio = fechaInicio;
+                ofertaData.hora_inicio = horaInicio;
+                ofertaData.inicio = new Date(`${fechaInicio}T${horaInicio}`);
+            }
+            
+            if (fechaFin && horaFin) {
+                ofertaData.fecha_fin = fechaFin;
+                ofertaData.hora_fin = horaFin;
+                ofertaData.fin = new Date(`${fechaFin}T${horaFin}`);
+            }
+        }
+        
+        await db.collection('ofertas').doc(id).update(ofertaData);
+        
+        // Limpiar animación y modo edición
+        const formContainer = document.querySelector('.oferta-config');
+        if (formContainer) {
+            formContainer.classList.remove('editing');
+        }
+        
+        const instruccion = document.getElementById('instruccion-edicion');
+        if (instruccion) {
+            instruccion.remove();
+        }
+        
+        // Restaurar interfaz
+        ofertaConfig.id = null;
+        document.getElementById('activarOferta').innerHTML = '<i class="fas fa-play-circle"></i> Activar Oferta';
+        
+        const cancelBtn = document.getElementById('cancelarEdicionOferta');
+        if (cancelBtn) {
+            cancelBtn.style.display = 'none';
+        }
+        
+        showNotification('Oferta actualizada correctamente', 'success');
+        await loadOfertas();
+        hideLoading();
+        
+    } catch (error) {
+        console.error('Error al actualizar oferta:', error);
+        showNotification('Error al actualizar la oferta: ' + error.message, 'error');
         hideLoading();
     }
 }
