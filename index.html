@@ -1945,6 +1945,25 @@
     font-weight: bold;
     margin-left: 10px;
 }
+
+/* ========== NOTIFICACIONES DE TURNOS AFECTADOS ========== */
+.notification-turno-afectado {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    background-color: #121212 !important;
+    color: white !important;
+    font-weight: bold;
+    z-index: 10000;
+    display: none;
+    animation: slideInRight 0.5s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    border: 2px solid #d4af37;
+    max-width: 400px;
+    min-width: 300px;
+}
     </style>
 </head>
 
@@ -3135,12 +3154,6 @@ document.addEventListener('DOMContentLoaded', function () {
     loadInitialData();
 
     cargarServiciosAdicionales();
-    
-    // Configurar formulario de nuevo servicio
-    const formNuevoServicio = document.getElementById('formNuevoServicioAdicional');
-    if (formNuevoServicio) {
-        formNuevoServicio.addEventListener('submit', guardarNuevoServicioAdicional);
-    }
 });
 
 // Función para manejar consultas con timeout y errores
@@ -7027,6 +7040,8 @@ AdminApp.cambiarEstadoTurno = async function(id, nuevoEstado) {
     }
 };    
 
+// ========== FUNCIONES PARA SERVICIOS ADICIONALES - VERSIÓN CORREGIDA ==========
+
 // Cargar servicios adicionales desde Firebase
 async function cargarServiciosAdicionales() {
     try {
@@ -7052,36 +7067,10 @@ async function cargarServiciosAdicionales() {
         
     } catch (error) {
         console.error('Error en cargarServiciosAdicionales:', error);
-        // Si la colección no existe, crear un servicio de ejemplo
         if (error.code === 'not-found' || error.message.includes('not-found')) {
             console.log('Creando colección de servicios adicionales...');
             await crearServicioAdicionalEjemplo();
         }
-    }
-}
-
-// Crear un servicio adicional de ejemplo
-async function crearServicioAdicionalEjemplo() {
-    try {
-        showLoading();
-        
-        const servicioEjemplo = {
-            nombre: "Gaseosa 500ml",
-            precio: 800,
-            activo: true,
-            creado_en: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        
-        await db.collection('servicios_adicionales').add(servicioEjemplo);
-        
-        showNotification('Servicio adicional de ejemplo creado', 'success');
-        await cargarServiciosAdicionales();
-        hideLoading();
-        
-    } catch (error) {
-        console.error('Error al crear servicio de ejemplo:', error);
-        showNotification('Error al crear servicio adicional', 'error');
-        hideLoading();
     }
 }
 
@@ -7139,23 +7128,21 @@ function renderServiciosAdicionalesAdmin() {
     container.innerHTML = html;
 }
 
-// Abrir modal para nuevo servicio adicional
+// Abrir modal para nuevo servicio adicional (MODO CREACIÓN)
 function abrirModalNuevoServicio() {
+    // Resetear el formulario para modo creación
+    resetFormularioServicioAdicional();
+    
     const modal = document.getElementById('modalNuevoServicioAdicional');
     const overlay = document.getElementById('overlayServiciosAdicionales');
     
     if (modal && overlay) {
-        // Resetear formulario
-        const form = document.getElementById('formNuevoServicioAdicional');
-        if (form) form.reset();
-        
-        // Mostrar modal
         modal.classList.add('active');
         overlay.classList.add('active');
     }
 }
 
-// Cerrar modal nuevo servicio
+// Cerrar modal de nuevo servicio
 function cerrarModalNuevoServicio() {
     const modal = document.getElementById('modalNuevoServicioAdicional');
     const overlay = document.getElementById('overlayServiciosAdicionales');
@@ -7163,10 +7150,13 @@ function cerrarModalNuevoServicio() {
     if (modal && overlay) {
         modal.classList.remove('active');
         overlay.classList.remove('active');
+        
+        // Resetear el formulario
+        resetFormularioServicioAdicional();
     }
 }
 
-// Guardar nuevo servicio adicional
+// Guardar nuevo servicio adicional (SOLO CREACIÓN)
 async function guardarNuevoServicioAdicional(e) {
     e.preventDefault();
     
@@ -7180,6 +7170,23 @@ async function guardarNuevoServicioAdicional(e) {
             showNotification('Nombre y precio son requeridos', 'error');
             hideLoading();
             return;
+        }
+        
+        // Verificar si ya existe un servicio con el mismo nombre
+        const existe = serviciosAdicionalesData.find(s => 
+            s.nombre.toLowerCase() === nombre.toLowerCase()
+        );
+        
+        if (existe) {
+            if (!confirm(`Ya existe un servicio "${nombre}". ¿Deseas editarlo en lugar de crear uno nuevo?`)) {
+                hideLoading();
+                return;
+            } else {
+                // Cargar el existente para editar
+                await editarServicioAdicional(existe.id);
+                hideLoading();
+                return;
+            }
         }
         
         const servicioData = {
@@ -7207,6 +7214,119 @@ async function guardarNuevoServicioAdicional(e) {
     }
 }
 
+// Editar servicio adicional (MODO EDICIÓN)
+async function editarServicioAdicional(id) {
+    try {
+        showLoading();
+        
+        // Buscar el servicio en los datos cargados
+        const servicio = serviciosAdicionalesData.find(s => s.id === id);
+        
+        if (servicio) {
+            console.log('📝 EDITANDO servicio adicional:', servicio.nombre);
+            
+            // Cargar datos en el formulario
+            document.getElementById('nombreServicioAdicional').value = servicio.nombre || '';
+            document.getElementById('precioServicioAdicional').value = servicio.precio || 0;
+            
+            // Abrir modal
+            const modal = document.getElementById('modalNuevoServicioAdicional');
+            const overlay = document.getElementById('overlayServiciosAdicionales');
+            
+            if (modal && overlay) {
+                modal.classList.add('active');
+                overlay.classList.add('active');
+            }
+            
+            // Cambiar título del modal
+            const modalTitle = document.querySelector('#modalNuevoServicioAdicional h3');
+            if (modalTitle) {
+                modalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Servicio Adicional';
+            }
+            
+            // Cambiar texto del botón y guardar ID en un atributo data
+            const submitBtn = document.querySelector('#formNuevoServicioAdicional button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Actualizar Servicio';
+                submitBtn.setAttribute('data-edit-id', id);
+                submitBtn.style.backgroundColor = 'var(--warning)';
+            }
+            
+            // Cambiar el evento onsubmit temporalmente
+            const form = document.getElementById('formNuevoServicioAdicional');
+            form.onsubmit = async function(e) {
+                e.preventDefault();
+                await actualizarServicioAdicional(id);
+            };
+            
+            showNotification('Cargando servicio para editar...', 'info');
+        } else {
+            showNotification('No se encontró el servicio', 'error');
+        }
+        
+        hideLoading();
+        
+    } catch (error) {
+        console.error('Error al cargar servicio adicional:', error);
+        showNotification('Error al cargar servicio', 'error');
+        hideLoading();
+    }
+}
+
+// Actualizar servicio adicional (ACTUALIZACIÓN, NO CREACIÓN)
+async function actualizarServicioAdicional(id) {
+    try {
+        showLoading();
+        
+        const nombre = document.getElementById('nombreServicioAdicional').value;
+        const precio = parseFloat(document.getElementById('precioServicioAdicional').value);
+        
+        if (!nombre || !precio || isNaN(precio)) {
+            showNotification('Nombre y precio son requeridos', 'error');
+            hideLoading();
+            return;
+        }
+        
+        console.log('🔄 ACTUALIZANDO servicio adicional ID:', id);
+        
+        // Verificar si el nombre ya existe en OTRO servicio
+        const existeOtro = serviciosAdicionalesData.find(s => 
+            s.id !== id && s.nombre.toLowerCase() === nombre.toLowerCase()
+        );
+        
+        if (existeOtro) {
+            showNotification(`Ya existe otro servicio con el nombre "${nombre}"`, 'error');
+            hideLoading();
+            return;
+        }
+        
+        // ✅ ACTUALIZAR el documento existente (NO crear uno nuevo)
+        await db.collection('servicios_adicionales').doc(id).update({
+            nombre,
+            precio,
+            actualizado_en: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        showNotification('Servicio actualizado correctamente', 'success');
+        
+        // Resetear el formulario
+        resetFormularioServicioAdicional();
+        
+        // Actualizar lista
+        await cargarServiciosAdicionales();
+        
+        // Cerrar modal
+        cerrarModalNuevoServicio();
+        
+        hideLoading();
+        
+    } catch (error) {
+        console.error('Error al actualizar servicio adicional:', error);
+        showNotification('Error al actualizar servicio: ' + error.message, 'error');
+        hideLoading();
+    }
+}
+
 // Eliminar servicio adicional
 async function eliminarServicioAdicional(id) {
     if (!confirm('¿Estás seguro de eliminar este servicio adicional?\nEsta acción no se puede deshacer.')) {
@@ -7229,108 +7349,70 @@ async function eliminarServicioAdicional(id) {
     }
 }
 
-// Editar servicio adicional
-async function editarServicioAdicional(id) {
-    try {
-        const doc = await db.collection('servicios_adicionales').doc(id).get();
+// Resetear formulario de servicio adicional
+function resetFormularioServicioAdicional() {
+    const form = document.getElementById('formNuevoServicioAdicional');
+    if (form) {
+        form.reset();
         
-        if (doc.exists) {
-            const servicio = { id: doc.id, ...doc.data() };
-            
-            // Cargar en formulario
-            document.getElementById('nombreServicioAdicional').value = servicio.nombre;
-            document.getElementById('precioServicioAdicional').value = servicio.precio;
-            
-            // Abrir modal
-            abrirModalNuevoServicio();
-            
-            // Cambiar texto del botón
-            const form = document.getElementById('formNuevoServicioAdicional');
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Actualizar Servicio';
-                submitBtn.setAttribute('data-edit-id', id);
-                
-                // Cambiar evento
-                form.onsubmit = async function(e) {
-                    e.preventDefault();
-                    await actualizarServicioAdicional(id);
-                };
-            }
+        // ✅ CORREGIDO: Restaurar onsubmit, NO addEventListener
+        form.onsubmit = guardarNuevoServicioAdicional;
+        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Servicio';
+            submitBtn.style.backgroundColor = '';
+            submitBtn.removeAttribute('data-edit-id');
         }
-        
-    } catch (error) {
-        console.error('Error al cargar servicio adicional:', error);
-        showNotification('Error al cargar servicio', 'error');
     }
+    
+    // Restaurar título del modal
+    const modalTitle = document.querySelector('#modalNuevoServicioAdicional h3');
+    if (modalTitle) {
+        modalTitle.innerHTML = '<i class="fas fa-plus"></i> Nuevo Servicio Adicional';
+    }
+    
+    console.log('✅ Formulario de servicio adicional reseteado');
 }
 
-// Actualizar servicio adicional
-async function actualizarServicioAdicional(id) {
+// Crear un servicio adicional de ejemplo
+async function crearServicioAdicionalEjemplo() {
     try {
         showLoading();
         
-        const nombre = document.getElementById('nombreServicioAdicional').value;
-        const precio = parseFloat(document.getElementById('precioServicioAdicional').value);
+        const servicioEjemplo = {
+            nombre: "Gaseosa 500ml",
+            precio: 800,
+            activo: true,
+            creado_en: firebase.firestore.FieldValue.serverTimestamp()
+        };
         
-        if (!nombre || !precio || isNaN(precio)) {
-            showNotification('Nombre y precio son requeridos', 'error');
-            hideLoading();
-            return;
-        }
+        await db.collection('servicios_adicionales').add(servicioEjemplo);
         
-        await db.collection('servicios_adicionales').doc(id).update({
-            nombre,
-            precio,
-            actualizado_en: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        showNotification('Servicio actualizado correctamente', 'success');
-        
-        // Actualizar lista
+        showNotification('Servicio adicional de ejemplo creado', 'success');
         await cargarServiciosAdicionales();
-        
-        // Cerrar modal y resetear formulario
-        cerrarModalNuevoServicio();
-        const form = document.getElementById('formNuevoServicioAdicional');
-        if (form) {
-            form.reset();
-            form.onsubmit = guardarNuevoServicioAdicional;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Servicio';
-                submitBtn.removeAttribute('data-edit-id');
-            }
-        }
-        
         hideLoading();
         
     } catch (error) {
-        console.error('Error al actualizar servicio adicional:', error);
-        showNotification('Error al actualizar servicio: ' + error.message, 'error');
+        console.error('Error al crear servicio de ejemplo:', error);
+        showNotification('Error al crear servicio adicional', 'error');
         hideLoading();
     }
 }
-
-// ========== HERRAMIENTA SIMPLIFICADA DE NOTIFICACIONES ==========
 
 // Variable global para almacenar turnos afectados
 let turnosAfectadosCache = [];
 
-// Función para agregar turno a la lista de afectados
 async function agregarTurnoAfectado(turnoId, razon) {
     try {
-        // Obtener datos del turno
         const turnoDoc = await db.collection('turnos').doc(turnoId).get();
         if (!turnoDoc.exists) return;
         
         const turno = { id: turnoDoc.id, ...turnoDoc.data() };
         
-        // Verificar si ya está en la lista
         const existe = turnosAfectadosCache.find(t => t.id === turnoId);
         if (existe) return;
         
-        // Agregar a la lista
         turnosAfectadosCache.push({
             ...turno,
             razon: razon,
@@ -7338,80 +7420,95 @@ async function agregarTurnoAfectado(turnoId, razon) {
             fecha_deteccion: new Date().toISOString()
         });
         
-        // Actualizar la UI
         actualizarListaTurnosAfectados();
         
-        // Mostrar notificación
-        showNotification(`Turno de ${turno.nombre} agregado a la lista de notificación`, 'warning');
+        // 🟢 NOTIFICACIÓN 1: Turno individual agregado
+        const noti = document.createElement('div');
+        noti.className = 'notification-turno-afectado';
+        noti.id = 'noti-turno-' + Date.now();
+        noti.innerHTML = `Turno de ${turno.nombre} agregado a la lista de notificación`;
+        noti.style.display = 'block';
+        document.body.appendChild(noti);
+        
+        setTimeout(() => {
+            noti.style.animation = 'slideOutRight 0.5s ease';
+            setTimeout(() => noti.remove(), 500);
+        }, 3000);
         
     } catch (error) {
-        console.error('Error al agregar turno afectado:', error);
+        console.error('Error:', error);
     }
 }
 
-// Función para actualizar la lista visual
+// Función para actualizar la lista visual - SOLO MUESTRA TURNOS NO NOTIFICADOS
 function actualizarListaTurnosAfectados() {
     const container = document.getElementById('listaTurnosAfectados');
     if (!container) return;
     
-    if (turnosAfectadosCache.length === 0) {
+    // 🟢 SOLO FILTRAR TURNOS NO NOTIFICADOS para mostrar
+    const turnosPendientes = turnosAfectadosCache.filter(t => !t.notificado);
+    
+    if (turnosPendientes.length === 0) {
         container.innerHTML = `
             <div style="text-align: center; padding: 20px; color: #aaa;">
                 <i class="fas fa-bell-slash fa-2x" style="margin-bottom: 10px;"></i>
                 <p>No hay turnos afectados por cambios recientes</p>
             </div>
         `;
-        return;
-    }
-    
-    let html = '';
-    
-    turnosAfectadosCache.forEach((turno, index) => {
-        const fechaObj = new Date(turno.fecha + 'T' + turno.hora);
-        const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short'
-        });
+    } else {
+        let html = '';
         
-        html += `
-            <div class="turno-afectado-item" onclick="mostrarOpcionesNotificacion('${turno.id}', ${index})">
-                <div class="turno-afectado-info">
-                    <div class="turno-afectado-fecha">${fechaFormateada} • ${turno.hora}</div>
-                    <div class="turno-afectado-cliente">${turno.nombre}</div>
-                    <div style="color: var(--warning); font-size: 0.8rem; margin-top: 3px;">
-                        <i class="fas fa-exclamation-triangle"></i> ${turno.razon}
+        turnosPendientes.forEach((turno, index) => {
+            const fechaObj = new Date(turno.fecha + 'T' + turno.hora);
+            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short'
+            });
+            
+            html += `
+                <div class="turno-afectado-item" onclick="mostrarOpcionesNotificacion('${turno.id}', ${turnosAfectadosCache.findIndex(t => t.id === turno.id)})">
+                    <div class="turno-afectado-info">
+                        <div class="turno-afectado-fecha">${fechaFormateada} • ${turno.hora}</div>
+                        <div class="turno-afectado-cliente">${turno.nombre}</div>
+                        <div style="color: var(--warning); font-size: 0.8rem; margin-top: 3px;">
+                            <i class="fas fa-exclamation-triangle"></i> ${turno.razon}
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn-whatsapp-directo" onclick="notificarTurnoIndividual('${turno.id}', event)">
+                            <i class="fab fa-whatsapp"></i> Notificar
+                        </button>
                     </div>
                 </div>
-                <div>
-                    ${turno.notificado ? 
-                        '<span style="color: var(--success); font-size: 0.8rem;"><i class="fas fa-check-circle"></i> Notificado</span>' : 
-                        `<button class="btn-whatsapp-directo" onclick="notificarTurnoIndividual('${turno.id}', event)">
-                            <i class="fab fa-whatsapp"></i> Notificar
-                        </button>`
-                    }
-                </div>
-            </div>
-        `;
-    });
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
     
-    container.innerHTML = html;
-    
-    // Actualizar badge en el botón de agenda si existe
+    // 🟢 ACTUALIZAR EL BADGE DEL BOTÓN AGENDA (solo con turnos NO notificados)
     const navBtnAgenda = document.querySelector('.nav-btn[data-section="agenda"]');
     if (navBtnAgenda) {
+        const turnosPendientes = turnosAfectadosCache.filter(t => !t.notificado);
         let badge = navBtnAgenda.querySelector('.notificacion-badge');
-        if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'notificacion-badge';
-            navBtnAgenda.appendChild(badge);
+        
+        if (turnosPendientes.length > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'notificacion-badge';
+                navBtnAgenda.appendChild(badge);
+            }
+            badge.textContent = turnosPendientes.length;
+            badge.style.display = 'flex';
+        } else {
+            if (badge) {
+                badge.style.display = 'none';
+            }
         }
-        badge.textContent = turnosAfectadosCache.length;
-        badge.style.display = turnosAfectadosCache.length > 0 ? 'flex' : 'none';
     }
 }
 
-// MODIFICAR la función guardarConfiguracionDia para usar la nueva herramienta
 async function guardarConfiguracionDia() {
     try {
         if (!fechaSeleccionadaAgenda) {
@@ -7432,10 +7529,8 @@ async function guardarConfiguracionDia() {
         
         const opcionRepeticion = document.querySelector('.opcion-repeticion.active')?.dataset.repeticion || 'unico';
         
-        // Obtener configuración anterior para comparar
         const configAnterior = horariosAgenda[fechaSeleccionadaAgenda] || {};
         
-        // Nueva configuración
         const configData = {
             fecha: fechaSeleccionadaAgenda,
             activo: estadoActivo,
@@ -7447,37 +7542,58 @@ async function guardarConfiguracionDia() {
             actualizado_en: firebase.firestore.FieldValue.serverTimestamp()
         };
         
-        // 1. Guardar la configuración primero
         await db.collection('horarios_agenda').doc(fechaSeleccionadaAgenda).set(configData);
-        
-        // 2. Sincronizar con calendario de usuario
         await db.collection('calendario_usuario').doc(fechaSeleccionadaAgenda).set(configData);
         
-        // 3. Actualizar cache local
         horariosAgenda[fechaSeleccionadaAgenda] = configData;
         
-        // 4. Aplicar repetición si es necesario
         if (opcionRepeticion !== 'unico') {
             await aplicarConfiguracionRepetida(configData, opcionRepeticion);
         }
         
-        // 5. Verificar turnos afectados
         const turnosAfectados = await verificarTurnosAfectados(fechaSeleccionadaAgenda, configAnterior, configData);
         
         if (turnosAfectados.length > 0) {
-            // Agregar cada turno afectado a la lista
+            // Agregar a la lista (sin notificación individual)
             turnosAfectados.forEach(turno => {
-                agregarTurnoAfectado(turno.id, turno.razon);
+                // Solo agregar al cache, sin notificación
+                const existe = turnosAfectadosCache.find(t => t.id === turno.id);
+                if (!existe) {
+                    turnosAfectadosCache.push({
+                        ...turno,
+                        razon: turno.razon,
+                        notificado: false,
+                        fecha_deteccion: new Date().toISOString()
+                    });
+                }
             });
             
-            showNotification(`Configuración guardada. ${turnosAfectados.length} turno(s) afectado(s) agregados a la lista de notificación.`, 'warning');
+            actualizarListaTurnosAfectados();
+            
+            // 🟢 SOLO ESTA NOTIFICACIÓN - Fondo negro, borde dorado
+            const fechaObj = new Date(fechaSeleccionadaAgenda + 'T12:00:00');
+            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', { 
+                day: '2-digit', 
+                month: '2-digit' 
+            });
+            
+            const noti = document.createElement('div');
+            noti.className = 'notification-turno-afectado';
+            noti.id = 'noti-config-' + Date.now();
+            noti.innerHTML = `Configuración guardada. Día: ${fechaFormateada} y ${turnosAfectados.length} turno(s) afectado(s) agregados a la lista de notificación.`;
+            noti.style.display = 'block';
+            document.body.appendChild(noti);
+            
+            setTimeout(() => {
+                noti.style.animation = 'slideOutRight 0.5s ease';
+                setTimeout(() => noti.remove(), 500);
+            }, 4000);
+            
         } else {
             showNotification('Configuración guardada correctamente', 'success');
         }
         
-        // 6. Actualizar calendario
         generarCalendarioAgenda();
-        
         hideLoading();
         
     } catch (error) {
@@ -7544,7 +7660,7 @@ async function verificarTurnosAfectados(fecha, configAnterior, configNueva) {
     }
 }
 
-// Función para notificar un turno individual
+// Función para notificar un turno individual - SE ACTUALIZA INMEDIATAMENTE
 async function notificarTurnoIndividual(turnoId, event) {
     if (event) event.stopPropagation();
     
@@ -7574,11 +7690,11 @@ Por favor, selecciona un nuevo horario disponible en nuestro sitio web.
             // Abrir WhatsApp en nueva pestaña
             window.open(urlWhatsApp, '_blank');
             
-            // Marcar como notificado
+            // 🟢 MARCAR COMO NOTIFICADO INMEDIATAMENTE
             turno.notificado = true;
             turno.fecha_notificacion = new Date().toISOString();
             
-            // Actualizar lista
+            // 🟢 ACTUALIZAR LA LISTA INMEDIATAMENTE (se elimina de la vista)
             actualizarListaTurnosAfectados();
             
             // Guardar en historial
@@ -8111,7 +8227,6 @@ async function inicializarSistemaNotificaciones() {
     console.log('✅ Sistema de notificaciones inicializado');
 }
 
-// Agregar al loadInitialData
 async function loadInitialData() {
     try {
         console.log('Cargando datos iniciales...');
@@ -8129,10 +8244,11 @@ async function loadInitialData() {
         // 1. Cargar datos iniciales
         await cargarConfiguracionAgenda();
         await cargarConfigFidelidad();
-
         await updateDashboard();
         await loadServicios();
         await loadOfertas();
+        
+        // ✅ IMPORTANTE: Cargar servicios adicionales
         await cargarServiciosAdicionales();
         
         // 2. Configurar escuchadores en tiempo real
@@ -8142,7 +8258,7 @@ async function loadInitialData() {
         setupSessionMonitoring();
         
         // 4. Inicializar sistema de notificaciones
-        await inicializarSistemaNotificaciones(); // ← NUEVA LÍNEA
+        await inicializarSistemaNotificaciones();
         
         isLoadingData = false;
         
@@ -8823,7 +8939,6 @@ function setupNavigation() {
                         updateDashboard();
                         break;
                     case 'turnos':
-                        loadTurnos();
                         cargarGridHorarios();
                         break;
                     case 'servicios':
@@ -8871,6 +8986,12 @@ function setupEventListeners() {
                 this.innerHTML = originalText;
             }
         });
+
+         // ✅ CORREGIDO: Usar solo onsubmit, NO addEventListener duplicado
+    const formNuevoServicio = document.getElementById('formNuevoServicioAdicional');
+    if (formNuevoServicio) {
+        formNuevoServicio.onsubmit = guardarNuevoServicioAdicional;
+    }
 
         // Listener para guardar configuración de fidelidad
     const guardarConfigFidelidadBtn = document.getElementById('guardarConfigFidelidad');
